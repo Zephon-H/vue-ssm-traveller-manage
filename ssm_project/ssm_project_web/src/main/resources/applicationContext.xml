@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--    开启注解扫描-->
+    <context:component-scan base-package="com.zephon.service"/>
+    <context:component-scan base-package="com.zephon.dao"/>
+    <context:component-scan base-package="com.zephon.aop"/>
+    <context:component-scan base-package="com.zephon.utils"/>
+
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!-- Spring 整合Mybatis框架-->
+    <!--    配置连接池-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!--    配置SqlSessionFactory工厂-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--       配置mybatis配置-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--传入PageHelper的插件-->
+        <property name="plugins">
+            <array>
+                <!--传入插件的对象-->
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <props>
+                            <!--数据库类型-->
+                            <prop key="helperDialect">mysql</prop>
+                            <!--分页合理化，不会越界-->
+                            <prop key="reasonable">true</prop>
+                        </props>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!--    mybatis-配置mapper,扫描dao接口-->
+    <!--    指定映射配置文件的位置，映射配置文件指每个dao独立的配置文件 -->
+    <!--    如果是用注解来配置的话，此处应该使用class属性指定被注解的dao全限定类名-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.zephon.dao"/>
+    </bean>
+
+    <!--    声明式事务-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- 文件上传的解析器 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 编码格式 -->
+        <property name="defaultEncoding" value="UTF-8"/>
+        <!-- 配置上传文件的大小，以字节为单位；-1代表没有限制 -->
+        <property name="maxUploadSize" value="-1"/>
+    </bean>
+
+    <!-- 权限不足异常捕捉 -->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.apache.shiro.authz.UnauthorizedException">
+                    /unauthorized
+                </prop>
+                <prop key="org.apache.shiro.authz.UnauthenticatedException">
+                    /unauthenticated
+                </prop>
+            </props>
+        </property>
+    </bean>
+</beans>

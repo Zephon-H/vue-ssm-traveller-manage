@@ -1,0 +1,19 @@
+.DS_Store
+ssm-vue/node_modules/
+ssm-vue/dist/
+ssm-vue/npm-debug.log*
+ssm-vue/yarn-debug.log*
+ssm-vue/yarn-error.log*
+ssm-vue/package-lock.json
+ssm-vue/tests/**/coverage/
+ssm_project/out/**
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.class
+

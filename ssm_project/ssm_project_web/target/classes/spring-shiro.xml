@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="userReam" class="com.zephon.shrio.UserRealm"/>
+    <!-- 配置securityManager-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+<!--        <property name="cacheManager" ref="cacheManager"/>-->
+        <property name="realm" ref="userReam"/>
+        <property name="subjectDAO">
+            <bean id="subjectDao" class="org.apache.shiro.mgt.DefaultSubjectDAO">
+                <property name="sessionStorageEvaluator">
+                    <bean class="org.apache.shiro.mgt.DefaultSessionStorageEvaluator">
+                        <property name="sessionStorageEnabled" value="false"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/user/login"/>
+        <property name="unauthorizedUrl" value="/autherror"/>
+
+        <!--
+           配置的方式
+       -->
+        <property name="filterChainDefinitions">
+            <value>
+                /user/login = anon
+<!--                /user/info = anon-->
+                /user/logout = anon
+                /autherror = anon
+                /** = authc
+            </value>
+        </property>
+    </bean>
+    <!-- 开启Shiro注解 -->
+    <bean
+            class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager" />
+    </bean>
+
+</beans>
