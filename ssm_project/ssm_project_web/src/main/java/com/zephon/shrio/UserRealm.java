@@ -6,6 +6,7 @@ import com.zephon.domain.UserInfo;
 import com.zephon.entity.JWTToken;
 import com.zephon.service.IUserService;
 import com.zephon.utils.JwtUtil;
+import com.zephon.utils.RedisUtil;
 import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -36,6 +37,8 @@ public class UserRealm extends AuthorizingRealm {
     private IUserService userService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public void setName(String name) {
@@ -55,7 +58,9 @@ public class UserRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         //1.获取安全数据
-        UserInfo userInfo = (UserInfo) principalCollection.getPrimaryPrincipal();
+//        UserInfo userInfo = (UserInfo) principalCollection.getPrimaryPrincipal();
+        String up = (String) principalCollection.getPrimaryPrincipal();
+        UserInfo userInfo = (UserInfo) redisUtil.get(up);
         //2.获取权限信息
         Set<Role> roles = userInfo.getRoles();
         Set<String> ps = new HashSet<>();
@@ -94,7 +99,9 @@ public class UserRealm extends AuthorizingRealm {
 
         UserInfo user = userService.findByUsername(username);
         if(user.getPassword().equals(password)){
-            return new SimpleAuthenticationInfo(user, token, user.getUsername());
+//            return new SimpleAuthenticationInfo(user, token, user.getUsername());
+            redisUtil.set(username+password,user);
+            return new SimpleAuthenticationInfo(username+password, token, user.getUsername());
         }
         return null;
     }

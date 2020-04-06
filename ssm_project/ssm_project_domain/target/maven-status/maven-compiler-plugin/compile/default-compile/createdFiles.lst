@@ -1,0 +1,11 @@
+com/zephon/domain/Role.class
+com/zephon/domain/Member.class
+com/zephon/entity/ResultCode.class
+com/zephon/domain/Permission.class
+com/zephon/domain/Order.class
+com/zephon/domain/Product.class
+com/zephon/entity/Result.class
+com/zephon/entity/JWTToken.class
+com/zephon/domain/SysLog.class
+com/zephon/domain/UserInfo.class
+com/zephon/domain/Traveller.class

@@ -9,13 +9,14 @@ import com.zephon.entity.Result;
 import com.zephon.entity.ResultCode;
 import com.zephon.service.IUserService;
 import com.zephon.utils.JwtUtil;
+import com.zephon.utils.RedisUtil;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -46,8 +47,7 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
-    private HttpServletRequest request;
-
+    private RedisUtil redisUtil;
 
     @PostMapping("/user/login")
     public Result login(@RequestBody Map<String, String> map) {
@@ -96,7 +96,9 @@ public class UserController {
         //1.subject获取所有的安全数据集合
         PrincipalCollection principals = subject.getPrincipals();
         // 获取安全数据
-        UserInfo result = (UserInfo) principals.getPrimaryPrincipal();
+//        UserInfo result = (UserInfo) principals.getPrimaryPrincipal();
+        String up = (String) principals.getPrimaryPrincipal();
+        UserInfo result = (UserInfo) redisUtil.get(up);
 
 //        Claims claims = jwtUtil.parseJwt(token);
 //        System.out.println(claims.get("userId"));

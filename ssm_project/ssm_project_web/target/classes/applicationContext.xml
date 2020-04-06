@@ -15,8 +15,9 @@
     <context:component-scan base-package="com.zephon.dao"/>
     <context:component-scan base-package="com.zephon.aop"/>
     <context:component-scan base-package="com.zephon.utils"/>
+    <context:annotation-config />
 
-    <context:property-placeholder location="classpath:db.properties"/>
+    <context:property-placeholder location="classpath:*.properties"/>
 
     <!-- Spring 整合Mybatis框架-->
     <!--    配置连接池-->
@@ -83,4 +84,6 @@
             </props>
         </property>
     </bean>
+    <import resource="spring-redis.xml"/>
+    <import resource="spring-shiro.xml"/>
 </beans>
